@@ -23,6 +23,9 @@ export default {
     getters: {
         flights(state) {
             return state.flights
+        },
+        flight: (state) => (id) => {
+            return state.flights.find(item => item.id === id)
         }
     }
 }
