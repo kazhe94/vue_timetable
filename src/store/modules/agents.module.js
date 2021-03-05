@@ -1,3 +1,5 @@
+import store from '../index'
+
 export default {
     namespaced: true,
     state() {
@@ -45,17 +47,12 @@ export default {
             localStorage.setItem('agents', JSON.stringify(state.agents))
         },
         setAgents(state, payload) {
-            const intersection = state.agents.filter(item => payload.agent.includes(item)).map(el => {
-                return {
-                    ...el,
-                    flights: [payload.id]
-                }
+            const flights = store.getters['flights/flights']
+            flights.find(item => item.id === payload.id).agents.push(...payload.agent)
+            payload.agent.forEach(item => {
+                state.agents.find(el => el.id === item.id).flights.push(payload.id)
             })
-            const difference = state.agents.filter(item => !payload.agent.includes(item))
-            console.log(difference)
-
-            state.agents = intersection.concat(difference)
-            console.log(state.agents)
+            localStorage.setItem('agents', JSON.stringify(state.agents))
         }
     },
     actions: {

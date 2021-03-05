@@ -26,9 +26,14 @@
           <td>{{flight.airport}}</td>
           <td>{{flight.company}}</td>
           <td>{{flight['aircraft_type_code']}}</td>
-          <td>{{flight.status || 'По расписанию'}}</td>
+          <td>{{flight.status}}</td>
           <td>
-            <button class="btn" @click.stop="modal = true, id = flight.id">Назначить</button>
+            <button class="btn" @click.stop="modal = true, id = flight.id">Apply</button>
+          </td>
+          <td>
+            <div v-for="a in flight.agents">
+              {{a.name}}
+            </div>
           </td>
         </tr>
       </tbody>
@@ -66,7 +71,6 @@ export default {
   },
   setup() {
     const store = useStore()
-    const router = useRouter()
     const loading = ref(true)
     const modal = ref(false)
     const assignedAgent = ref()
@@ -89,19 +93,15 @@ export default {
       await store.dispatch('flights/loadFlights', data)
     }
     const flights = computed(()=> store.getters['flights/flights'])
-    const openFlight = (id)=> {
-      const openedFlight = flights.value.find(item => item.id === id)
-      store.commit('flights/setOpenedFlight', openedFlight)
-      router.push('/flight')
-    }
     const agents = computed(()=> store.getters['agents/activeAgents'])
+
     assignedAgent.value = [...agents.value]
-    console.log(assignedAgent.value)
     const assign = () => {
       store.commit('agents/setAgents', {
         agent: assignedAgent.value,
         id: id.value
       })
+      modal.value = false
     }
     return {
       flights,
@@ -113,7 +113,6 @@ export default {
       assignedAgent,
       id,
       assign,
-      openFlight
     }
   }
 }

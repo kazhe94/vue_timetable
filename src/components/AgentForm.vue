@@ -47,7 +47,8 @@ export default {
         surname: surname.value,
         shift: shift.value,
         id: agentId.value,
-        status: status.value
+        status: status.value,
+        flights: []
       })
       emit('created')
       name.value = ''
