@@ -20,6 +20,7 @@
             :key="flight.id"
             class="flight-item"
             @click="$router.push(`/flight/${flight.id}`)"
+            :ref="setItemRefs"
         >
           <td>{{new Date(flight.departure_time.scheduled || flight.arrival_time.scheduled).toLocaleTimeString()}}</td>
           <td>{{flight.number}}</td>
@@ -56,7 +57,7 @@
 </template>
 
 <script>
-import {computed, onMounted, ref, watch} from 'vue'
+import {computed, onMounted, onUpdated, ref, watch} from 'vue'
 import {useStore} from "vuex";
 import AppLoader from "@/components/ui/AppLoader";
 import AppModal from "@/components/ui/AppModal";
@@ -75,6 +76,7 @@ export default {
     const modal = ref(false)
     const assignedAgent = ref()
     const id = ref()
+    const items = ref([])
 
     const type = ref('dep')
     const switcher = ref({
@@ -94,6 +96,17 @@ export default {
     }
     const flights = computed(()=> store.getters['flights/flights'])
     const agents = computed(()=> store.getters['agents/activeAgents'])
+    const idx = computed(()=> flights.value.findIndex(item => item.past === false))
+
+    const setItemRefs = (el)=> {
+      if(el) {
+        items.value.push(el)
+      }
+    }
+    onUpdated(() => {
+      items.value[idx.value].scrollIntoView({block: "center", behavior: "smooth"})
+    })
+
 
     assignedAgent.value = [...agents.value]
     const assign = () => {
@@ -113,6 +126,9 @@ export default {
       assignedAgent,
       id,
       assign,
+      setItemRefs,
+      idx
+
     }
   }
 }
